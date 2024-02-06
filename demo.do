@@ -24,12 +24,12 @@ sqreg L_pphec bggw_mean bggw_mean_2 L_hectares interaction7, quantiles(`quantile
 local modname = "amodel"
 
 * export the predictions and residuals into a .dta file for use in plotting
-run sqreg9_savedataresults `modname' `numeqs'
+run sqreg_saveresiduals `modname' `numeqs'
 
 * create the diagnostic plot for covariate bggw_mean
 use `modname'_data_augmented, clear
-run sqreg9_klhquantiles "bggw_mean" `modname' "`quantiles'"
+run sqreg_diagnosticplot "bggw_mean" `modname' "`quantiles'"
 
 * plot the diagnostic for the 50th quantile linear prediction
 *use `modname'_data_augmented, clear
-*run sqreg9_klhquantiles "pred5" `modname'  "`quantiles'"
+*run sqreg_diagnosticplot "pred5" `modname'  "`quantiles'"
