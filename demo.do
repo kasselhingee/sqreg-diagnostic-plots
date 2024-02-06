@@ -15,7 +15,6 @@ drawnorm xrand, sds(0.9) seed(3141)
 gen interaction7 = abs(xrand) * bggw_mean
 
 gen L_pphec = -20*L_hectares + 10*L_hectares*L_hectares + bggw_mean + bggw_mean_2 + interaction7 + xrand
-scatter L_pphec L_hectares
 
 * fit quantile regression simultaneously. Must be the given quantiles for this code
 sqreg L_pphec bggw_mean bggw_mean_2 L_hectares interaction7, quantiles(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9) reps(2)
@@ -23,12 +22,12 @@ sqreg L_pphec bggw_mean bggw_mean_2 L_hectares interaction7, quantiles(0.1 0.2 0
 local modname = "amodel"
 
 * export the predictions and residuals into a .dta file for use in plotting
-run sqreg9_savedataresults `modname'
+run sqreg9_savedataresults `modname' 9
 
 * create the diagnostic plot for covariate bggw_mean
 use `modname'_data_augmented, clear
-run sqreg9_klhquantiles "bggw_mean" `modname'
+run sqreg9_klhquantiles "bggw_mean" `modname' 9
 
 * plot the diagnostic for the 50th quantile linear prediction
 use `modname'_data_augmented, clear
-run sqreg9_klhquantiles "pred5" `modname'
+run sqreg9_klhquantiles "pred5" `modname' 9

@@ -1,9 +1,9 @@
 * subset by xcovar values
 * arguments are xcovar modname
-args xcovar modname
+args xcovar modname numeqs
 
 * save quantiles into macros - hard coded because scalars aren't saved by the save function
-forvalues lname = 1(1)9 {
+forvalues lname = 1(1)`numeqs' {
 	local q`lname' = `lname'*10
 }
 
@@ -18,7 +18,7 @@ graph bar (count), over(`xcovar'_bin, label(angle(90))) ylabel(#5, angle(horizon
 //graph export "`modname'_hist_`xcovar'.pdf", replace
 
 * compute quantiles of the residuals. For the Qth quantile model, the Qth quantile of the residual should equal 0
-forvalues qnum = 1(1)9 {
+forvalues qnum = 1(1)`numeqs' {
 	statsby q`qnum'v=r(c_1) q`qnum'v_l=r(lb_1) q`qnum'v_u=r(ub_1), by(`xcovar'_bin) saving("`modname'_centile_`qnum'_tmp.dta", replace): centile resid`qnum', centile(`q`qnum'')
 	statsby _b, by(`xcovar'_bin) saving("`modname'_pred`qnum'_tmp.dta", replace): mean pred`qnum'
 	* the saving code above means the centile results don't overwrite the existing data set).
@@ -29,19 +29,19 @@ collapse (median) `xcovar', by(`xcovar'_bin)  //changes data set to be just the 
 
 * combine all quantile results
 //use `modname'_centile_1_tmp
-forvalues qnum = 1(1)9 {
+forvalues qnum = 1(1)`numeqs' {
 merge 1:1 `xcovar'_bin using `modname'_centile_`qnum'_tmp, nogenerate
 merge 1:1 `xcovar'_bin using `modname'_pred`qnum'_tmp, nogenerate
 }
 
 * remove temporary files
-forvalues qnum = 1(1)9 {
+forvalues qnum = 1(1)`numeqs' {
 	erase `modname'_centile_`qnum'_tmp.dta
 	erase `modname'_pred`qnum'_tmp.dta
 }
 
-* plot
-forvalues lname = 1(1)9 {
+* plot panels
+forvalues lname = 1(1)`numeqs' {
 	twoway rcap q`lname'v_u q`lname'v_l `xcovar', lcolor(black) || scatter q`lname'v `xcovar', yline(0) name(plt`lname', replace) ylabel(#5, angle(horizontal) format(%5.0g)) ysize(12) xlabel(#10, angle(vertical)) mcolor(black) legend(off)
 	*remove large error bars*
 	su q`lname'v, meanonly
@@ -51,6 +51,8 @@ forvalues lname = 1(1)9 {
 	twoway scatter q`lname'v `xcovar', yline(0) name(plt`lname'_zoom, replace) ylabel(#5, angle(horizontal) format(%5.0g)) ysize(12) xlabel(#10, angle(vertical)) mcolor(black) || rcap q`lname'v_u q`lname'v `xcovar', lcolor(red) msize(large) || rcap q`lname'v q`lname'v_l `xcovar', lcolor(green) msize(large) legend(off)
 }
 set graphics on //so plots pop up again
+
+* create full plots
 graph combine plt1 plt2 plt3 plt4 plt5 plt6 plt7 plt8 plt9 hist, col(3) ysize(17) xsize(15) xcommon
 graph export "`modname'_`xcovar'_qall.pdf", replace
 graph combine plt1_zoom plt2_zoom plt3_zoom plt4_zoom plt5_zoom plt6_zoom plt7_zoom plt8_zoom plt9_zoom hist, col(3) ysize(17) xsize(15) xcommon
