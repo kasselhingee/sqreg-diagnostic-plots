@@ -1,10 +1,12 @@
 * subset by xcovar values
 * arguments are xcovar modname
-args xcovar modname numeqs
+args xcovar modname quantiles
+local numeqs = wordcount("`quantiles'")
 
 * save quantiles into macros - hard coded because scalars aren't saved by the save function
 forvalues lname = 1(1)`numeqs' {
-	local q`lname' = `lname'*10
+    local thisq : word `lname' of `quantiles'
+	local q`lname' = `thisq'*10
 }
 
 su `xcovar', meanonly
