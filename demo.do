@@ -5,6 +5,7 @@ egen bggw_mean = fill(-0.98(0.002)1)
 gen erich_mean = bggw_mean^4
 gen feve_mean = bggw_mean^3
 gen L_hectares = erich_mean^3
+gen hectares = exp(L_hectares)
 gen trend_slope_clearing = 1/(erich_mean)
 gen cropping_c_d_50 = bggw_mean > 0.25
 gen grazing_c_d_50 = erich_mean < 0.1
