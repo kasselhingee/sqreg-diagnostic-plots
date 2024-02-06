@@ -17,14 +17,14 @@ gen interaction7 = abs(xrand) * bggw_mean
 gen L_pphec = -20*L_hectares + 10*L_hectares*L_hectares + bggw_mean + bggw_mean_2 + interaction7 + xrand
 
 * fit quantile regression simultaneously. Must be the given quantiles as a space separated character list
-local quantiles = "0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9"
+local quantiles = "0.1 0.2 0.35 0.6 0.7 0.8 0.9"
 local numeqs = wordcount("`quantiles'")
 sqreg L_pphec bggw_mean bggw_mean_2 L_hectares interaction7, quantiles(`quantiles') reps(2)
 
 local modname = "amodel"
 
 * export the predictions and residuals into a .dta file for use in plotting
-run sqreg9_savedataresults `modname' 9
+run sqreg9_savedataresults `modname' `numeqs'
 
 * create the diagnostic plot for covariate bggw_mean
 use `modname'_data_augmented, clear

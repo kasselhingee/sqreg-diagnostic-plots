@@ -14,7 +14,7 @@ local binstep = (r(max) - r(min))/(10-1)
 
 egen `xcovar'_bin = cut(`xcovar'), at(`r(min)'(`binstep')`r(max)+`binstep'') label
 
-*set graphics off //so plots don't keep popping up
+set graphics off //so plots don't keep popping up
 
 graph bar (count), over(`xcovar'_bin, label(angle(90))) ylabel(#5, angle(horizontal)) name(hist, replace)
 //graph export "`modname'_hist_`xcovar'.pdf", replace
@@ -45,18 +45,29 @@ forvalues qnum = 1/`numeqs' {
 
 * plot panels
 forvalues lname = 1/`numeqs' {
-	twoway rcap q`lname'v_u q`lname'v_l `xcovar', lcolor(black) || scatter q`lname'v `xcovar', yline(0) name(plt`lname', replace) ylabel(#5, angle(horizontal) format(%5.0g)) ysize(12) xlabel(#10, angle(vertical)) mcolor(black) legend(off) xtitle("`xcovar'") ytitle("`q`lname''th Percentile Residual Quantile")
+	twoway rcap q`lname'v_u q`lname'v_l `xcovar', lcolor(black) || scatter q`lname'v `xcovar', yline(0) name(plt`lname', replace) ylabel(#5, angle(horizontal) format(%5.0g)) ysize(12) xlabel(#10, angle(vertical)) mcolor(black) legend(off) xtitle("`xcovar'") ytitle("`q`lname''th Percentile")
 	*remove large error bars*
 	su q`lname'v, meanonly
 	local tenpct = (r(max) - r(min))/10
 	replace q`lname'v_u = . if q`lname'v_u>r(max) + `tenpct'
 	replace q`lname'v_l = . if q`lname'v_u<r(min) - `tenpct'
-	twoway scatter q`lname'v `xcovar', yline(0) name(plt`lname'_zoom, replace) ylabel(#5, angle(horizontal) format(%5.0g)) ysize(12) xlabel(#10, angle(vertical)) mcolor(black) || rcap q`lname'v_u q`lname'v `xcovar', lcolor(red) msize(large) || rcap q`lname'v q`lname'v_l `xcovar', lcolor(green) msize(large) legend(off) xtitle("`xcovar'") ytitle("`q`lname''th Percentile Residual Quantile")
+	twoway scatter q`lname'v `xcovar', yline(0) name(plt`lname'_zoom, replace) ylabel(#5, angle(horizontal) format(%5.0g)) ysize(12) xlabel(#10, angle(vertical)) mcolor(black) || rcap q`lname'v_u q`lname'v `xcovar', lcolor(red) msize(large) || rcap q`lname'v q`lname'v_l `xcovar', lcolor(green) msize(large) legend(off) xtitle("`xcovar'") ytitle("`q`lname''th Percentile")
 }
 set graphics on //so plots pop up again
 
 * create full plots
-graph combine plt1 plt2 plt3 plt4 plt5 plt6 plt7 plt8 plt9 hist, col(3) ysize(17) xsize(15) xcommon
+local plotlist = ""
+forvalues qnum = 1/`numeqs' {
+	local tmp "plt`qnum'"
+	local plotlist = "`plotlist' `tmp'"
+}
+graph combine `plotlist' hist, col(3) ysize(17) xsize(15) xcommon
 graph export "`modname'_`xcovar'_qall.pdf", replace
-graph combine plt1_zoom plt2_zoom plt3_zoom plt4_zoom plt5_zoom plt6_zoom plt7_zoom plt8_zoom plt9_zoom hist, col(3) ysize(17) xsize(15) xcommon
+
+local plotlist = ""
+forvalues qnum = 1/`numeqs' {
+	local tmp "plt`qnum'_zoom"
+	local plotlist = "`plotlist' `tmp'"
+}
+graph combine `plotlist' hist, col(3) ysize(17) xsize(15) xcommon
 graph export "`modname'_`xcovar'_qall_zoom.pdf", replace
