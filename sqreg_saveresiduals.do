@@ -1,14 +1,13 @@
-* arguments are aname (for a model name), which is used to choose file names
-args modname numeqs
+* arguments are modname (for a model name)
+args modname
 
 * keep only data used
 gen used = e(sample)
 keep if used==1
 
 * export predictions to variables
-forvalues lname = 1(1)`numeqs' {
+forvalues lname = 1/`e(n_q)' {
 	predict pred`lname', equation(#`lname') xb
 	gen resid`lname' = L_pphec - pred`lname'
-	* scalar q`lname' = e(q`lname') * 100
 }
-save `modname'_data_augmented, replace //the scalars aren't saved through
+save `modname'_residuals, replace

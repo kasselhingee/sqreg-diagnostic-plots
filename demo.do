@@ -17,19 +17,30 @@ gen interaction7 = abs(xrand) * bggw_mean
 gen L_pphec = -20*L_hectares + 10*L_hectares*L_hectares + bggw_mean + bggw_mean_2 + interaction7 + xrand
 
 * fit quantile regression simultaneously. Must be the given quantiles as a space separated character list
-local quantiles = "0.1 0.2 0.35 0.6 0.7 0.8 0.9"
-local numeqs = wordcount("`quantiles'")
-sqreg L_pphec bggw_mean bggw_mean_2 L_hectares interaction7, quantiles(`quantiles') reps(2)
+sqreg L_pphec bggw_mean bggw_mean_2 L_hectares interaction7, quantiles(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9) reps(2)
 
-local modname = "amodel"
+local modname = "demo" //used for creating files (including temporary files)
+
+
+
+
+** PLOT DIAGNOSTICS **
+* get quantiles used in sqreg
+local quantiles = ""
+forvalues qnum = 1/`e(n_q)' {
+	local quantiles = "`quantiles' `e(q`qnum')'"
+}
+display "`quantiles'"
 
 * export the predictions and residuals into a .dta file for use in plotting
-run sqreg_saveresiduals `modname' `numeqs'
+run sqreg_saveresiduals `modname'
 
 * create the diagnostic plot for covariate bggw_mean
-use `modname'_data_augmented, clear
+use `modname'_residuals, clear
 run sqreg_diagnosticplot "bggw_mean" `modname' "`quantiles'"
 
 * plot the diagnostic for the 50th quantile linear prediction
-*use `modname'_data_augmented, clear
+*use `modname'_residuals, clear
 *run sqreg_diagnosticplot "pred5" `modname'  "`quantiles'"
+
+erase `modname'_residuals.dta
