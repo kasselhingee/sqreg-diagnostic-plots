@@ -11,5 +11,14 @@ For quantile regression of the Qth quantile, the equivalent is that the residual
 An example graphic for checking this is created by the `cqcheck()` function in the `qgam` package (Fasiolo et al., 2021) for R.
 While Stata can do quantile regression, I could not find any methods to easily create a similar plot in Stata.
 
-# References
+## Author
+This was my first entrance into using Stata, so there are some very clunky operations that expert Stata programmers will cringe at.
+
+## Dependencies
+Stata 17
+
+## Usage
+Look at `demo.do` for an example use.
+
+## References
 Fasiolo, M., Wood, S.N., Zaffran, M., Nedellec, R., Goude, Y., 2021. qgam: Bayesian nonparametric quantile regression modeling in R. J. Stat. Softw. 100 (9), 1–31. https://doi.org/10.18637/jss.v100.i09.
