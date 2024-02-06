@@ -1,12 +1,11 @@
-* subset by xcovar values
-* arguments are xcovar modname
+* arguments are xcovar modname and a space-seperated character vector of the quantiles
 args xcovar modname quantiles
 local numeqs = wordcount("`quantiles'")
 
-* save quantiles into macros - hard coded because scalars aren't saved by the save function
-forvalues lname = 1/`numeqs' {
-    local thisq : word `lname' of `quantiles'
-	local q`lname' = `thisq'*100
+* save quantiles into macros - x100 because that is the format needed for centile
+forvalues qidx = 1/`numeqs' {
+    local thisq : word `qidx' of `quantiles'
+	local q`qidx' = `thisq'*100
 }
 
 su `xcovar', meanonly
@@ -20,53 +19,53 @@ graph bar (count), over(`xcovar'_bin, label(angle(90))) ylabel(#5, angle(horizon
 //graph export "`modname'_hist_`xcovar'.pdf", replace
 
 * compute quantiles of the residuals. For the Qth quantile model, the Qth quantile of the residual should equal 0
-forvalues qnum = 1/`numeqs' {
-	statsby q`qnum'v=r(c_1) q`qnum'v_l=r(lb_1) q`qnum'v_u=r(ub_1), by(`xcovar'_bin) saving("`modname'_centile_`qnum'_tmp.dta", replace): centile resid`qnum', centile(`q`qnum'')
-	statsby _b, by(`xcovar'_bin) saving("`modname'_pred`qnum'_tmp.dta", replace): mean pred`qnum'
+forvalues qidx = 1/`numeqs' {
+	statsby q`qidx'v=r(c_1) q`qidx'v_l=r(lb_1) q`qidx'v_u=r(ub_1), by(`xcovar'_bin) saving("`modname'_centile_`qidx'_tmp.dta", replace): centile resid`qidx', centile(`q`qidx'')
+	statsby _b, by(`xcovar'_bin) saving("`modname'_pred`qidx'_tmp.dta", replace): mean pred`qidx'
 	* the saving code above means the centile results don't overwrite the existing data set).
-	* the mean call with _b saves results as a variable _b_pred`qnum'
+	* the mean call with _b saves results as a variable _b_pred`qidx'
 }
 
 collapse (median) `xcovar', by(`xcovar'_bin)  //changes data set to be just the medians of xcovar and xcovar bin, required to combine all quantile results
 
 * combine all quantile results
 //use `modname'_centile_1_tmp
-forvalues qnum = 1/`numeqs' {
-merge 1:1 `xcovar'_bin using `modname'_centile_`qnum'_tmp, nogenerate
-merge 1:1 `xcovar'_bin using `modname'_pred`qnum'_tmp, nogenerate
+forvalues qidx = 1/`numeqs' {
+merge 1:1 `xcovar'_bin using `modname'_centile_`qidx'_tmp, nogenerate
+merge 1:1 `xcovar'_bin using `modname'_pred`qidx'_tmp, nogenerate
 }
 
 
 * remove temporary files
-forvalues qnum = 1/`numeqs' {
-	erase `modname'_centile_`qnum'_tmp.dta
-	erase `modname'_pred`qnum'_tmp.dta
+forvalues qidx = 1/`numeqs' {
+	erase `modname'_centile_`qidx'_tmp.dta
+	erase `modname'_pred`qidx'_tmp.dta
 }
 
 * plot panels
-forvalues lname = 1/`numeqs' {
-	twoway rcap q`lname'v_u q`lname'v_l `xcovar', lcolor(black) || scatter q`lname'v `xcovar', yline(0) name(plt`lname', replace) ylabel(#5, angle(horizontal) format(%5.0g)) ysize(12) xlabel(#10, angle(vertical)) mcolor(black) legend(off) xtitle("`xcovar'") ytitle("`q`lname''th Percentile")
+forvalues qidx = 1/`numeqs' {
+	twoway rcap q`qidx'v_u q`qidx'v_l `xcovar', lcolor(black) || scatter q`qidx'v `xcovar', yline(0) name(plt`qidx', replace) ylabel(#5, angle(horizontal) format(%5.0g)) ysize(12) xlabel(#10, angle(vertical)) mcolor(black) legend(off) xtitle("`xcovar'") ytitle("`q`qidx''th Percentile")
 	*remove large error bars*
-	su q`lname'v, meanonly
+	su q`qidx'v, meanonly
 	local tenpct = (r(max) - r(min))/10
-	replace q`lname'v_u = . if q`lname'v_u>r(max) + `tenpct'
-	replace q`lname'v_l = . if q`lname'v_u<r(min) - `tenpct'
-	twoway scatter q`lname'v `xcovar', yline(0) name(plt`lname'_zoom, replace) ylabel(#5, angle(horizontal) format(%5.0g)) ysize(12) xlabel(#10, angle(vertical)) mcolor(black) || rcap q`lname'v_u q`lname'v `xcovar', lcolor(red) msize(large) || rcap q`lname'v q`lname'v_l `xcovar', lcolor(green) msize(large) legend(off) xtitle("`xcovar'") ytitle("`q`lname''th Percentile")
+	replace q`qidx'v_u = . if q`qidx'v_u>r(max) + `tenpct'
+	replace q`qidx'v_l = . if q`qidx'v_u<r(min) - `tenpct'
+	twoway scatter q`qidx'v `xcovar', yline(0) name(plt`qidx'_zoom, replace) ylabel(#5, angle(horizontal) format(%5.0g)) ysize(12) xlabel(#10, angle(vertical)) mcolor(black) || rcap q`qidx'v_u q`qidx'v `xcovar', lcolor(red) msize(large) || rcap q`qidx'v q`qidx'v_l `xcovar', lcolor(green) msize(large) legend(off) xtitle("`xcovar'") ytitle("`q`qidx''th Percentile")
 }
 set graphics on //so plots pop up again
 
 * create full plots
 local plotlist = ""
-forvalues qnum = 1/`numeqs' {
-	local tmp "plt`qnum'"
+forvalues qidx = 1/`numeqs' {
+	local tmp "plt`qidx'"
 	local plotlist = "`plotlist' `tmp'"
 }
 graph combine `plotlist' hist, col(3) ysize(17) xsize(15) xcommon
 graph export "`modname'_`xcovar'_qall.pdf", replace
 
 local plotlist = ""
-forvalues qnum = 1/`numeqs' {
-	local tmp "plt`qnum'_zoom"
+forvalues qidx = 1/`numeqs' {
+	local tmp "plt`qidx'_zoom"
 	local plotlist = "`plotlist' `tmp'"
 }
 graph combine `plotlist' hist, col(3) ysize(17) xsize(15) xcommon
