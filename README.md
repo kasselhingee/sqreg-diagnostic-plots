@@ -18,7 +18,8 @@ This was my first entrance into using Stata, so there are some very clunky opera
 Stata 17
 
 ## Usage
-Look at `demo.do` for an example use.
+Look at `demo.do` for an example use. Run the full demo by typing `run demo` in Stata's command pannel.
+
 
 ## References
 Fasiolo, M., Wood, S.N., Zaffran, M., Nedellec, R., Goude, Y., 2021. qgam: Bayesian nonparametric quantile regression modeling in R. J. Stat. Softw. 100 (9), 1–31. https://doi.org/10.18637/jss.v100.i09.
