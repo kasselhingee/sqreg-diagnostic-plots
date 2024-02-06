@@ -20,8 +20,9 @@ scatter L_pphec L_hectares
 * fit quantile regression simultaneously
 sqreg L_pphec bggw_mean bggw_mean_2 L_hectares interaction7, quantiles(0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9) reps(2)
 
-mkdir "n1000"
+local modname = "amodel"
 
-do sqreg9_manydiagnostics "n1000" "test"
+run sqreg9_savedataresults `modname'
 
-do sqreg9_manyplots "n1000/test"
+use `modname'_data_augmented, clear
+run sqreg9_klhquantiles "pred5" `modname'
