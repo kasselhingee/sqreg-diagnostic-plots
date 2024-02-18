@@ -1,3 +1,7 @@
+* This do file generates residual diagnostic plots saved as .pdf in `modname'_`xcovar'_qall.pdf and `modname'_`xcovar'_qall_zoom.pdf
+* Each file contains point plots with error bars, and a histogram of the amount of data in each bin.
+* The modelling assumption that the conditional quantiles are given by the model is confirmed if all error bars cross over zero.
+* The two pdfs are of the same thing, except the _zoom.pdf file omits larger error bars for easier viewing.
 * arguments are xcovar, a space-seperated character vector of the quantiles, and a model name (modname)
 args xcovar quantiles modname
 local numeqs = wordcount("`quantiles'")

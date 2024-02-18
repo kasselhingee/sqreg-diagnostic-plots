@@ -1,3 +1,4 @@
+* this do file saves residuals in a .dta file called `modname'_residuals
 * arguments are yname for the set of predictions and modname (for a model name)
 args yname modname
 
