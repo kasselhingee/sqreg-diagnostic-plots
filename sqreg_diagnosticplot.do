@@ -1,5 +1,5 @@
-* arguments are xcovar modname and a space-seperated character vector of the quantiles
-args xcovar modname quantiles
+* arguments are xcovar, a space-seperated character vector of the quantiles, and a model name (modname)
+args xcovar quantiles modname
 local numeqs = wordcount("`quantiles'")
 
 * save quantiles into macros - x100 because that is the format needed for centile
