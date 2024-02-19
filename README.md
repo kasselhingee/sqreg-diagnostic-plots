@@ -71,7 +71,7 @@ The covariate is divided into 10 equally spaced bins.
 The final panel is a histogram of the data binned according to the covariate.
 The other panels each correspond to a requested quantile model in sqreg. They are ordered left to right, top to bottom.
 The dots are the estimated quantiles of the residuals in the bin, and their error bars show a 95% confidence interval for the estimate.
-If many more than 5% of the error bars do not cross zero then the the model assumption is wrong for the quantile model.
+If for any model, many more than 5% of the error bars do not cross zero then the the model assumption is wrong for the quantile model.
 If the quantile of the residual is systematically different to zero then that suggests covariates to add to the model.
 
 Below is an example where the conditional quantiles appear correctly predicted by the model for the 20th percentile.
