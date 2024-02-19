@@ -69,12 +69,12 @@ If an error bar does not cross zero then the the model assumption is wrong for t
 If there is a systematic difference between quantile of the residual and the covariate then that may point to an improved model.
 
 Below is an example where the conditional quantiles appear correctly predicted by the model for the 20th percentile.
-![A panel with all error bars crossing zero](/demo_panel_pass.png)
+![A panel with all error bars crossing zero](/demo_panel_pass.PNG)
 
 When there are many error bars that dont cross zero then I conclude that the conditional quantiles are not predicted by the model.
 The figure below is an example of this.
 In this case, the model is missing the square of 'x1'
-![A panel with some error bars above zero](/demo_panel_fail.png)
+![A panel with some error bars above zero](/demo_panel_fail.PNG)
 
 ## References
 Fasiolo, M., Wood, S.N., Zaffran, M., Nedellec, R., Goude, Y., 2021. qgam: Bayesian nonparametric quantile regression modeling in R. J. Stat. Softw. 100 (9), 1–31. https://doi.org/10.18637/jss.v100.i09.
