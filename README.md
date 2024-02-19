@@ -4,7 +4,7 @@ Initially created for the publication: Clayton, H., Hingee, K. L., Chancellor, W
 
 
 ## Background
-In ordinary least squares regression we often create residual plots to check that residuals have the correct behavious 
+In ordinary least squares regression we often create residual plots to check that residuals have the correct behaviour 
 (centered on zero and constant variance). If this is not the case then we must modify the model.
 
 For quantile regression of the Qth quantile, the equivalent is that the residuals should have a Qth quantile of zero.
@@ -51,29 +51,37 @@ run sqreg_diagnosticplot "covariatename" `modname' "`quantiles'"
 ```
 
 ## Assessing Your Model
-In every quantile regression model for quantile Q, there is an assumption that at any given covariate values, the Qth quantile of the response is predicted by the model.
-Often this quantile of the response conditional on covariate values is called the 'conditional quantile'. In 'sqreg' this assumption is made for every quantile modelled.
-Another way to state this assumption is that the conditional quantile of the residual (response - prediction) is zero.
+### Quick
+In the figures produced, the error bars should usually cross zero.
+If there are many (more than 1 in 20 say) that don't cross zero then that model is not predicting the quantiles correctly.
+A systematic difference to zero may suggest terms to add to the model.
 
-Usually data is such that every measurement has a unique set of covariate values, so we cant estimate conditional quantiles of the residuals directly.
+### Long
+In every quantile regression model for quantile Q, there is an assumption that at any given covariate values, the Qth quantile of the response is predicted by the model.
+Often this quantile of the response conditional on covariate values is called the 'conditional quantile'. Another way to state this assumption is that the conditional quantile of the residual (response - prediction) is zero.
+In 'sqreg' this assumption is made for every quantile modelled.
+
+
+Usually data is such that every measurement has a unique set of covariate values, so we cannot estimate conditional quantiles of the residuals directly.
 But we can get close by estimating the quantiles of the residuals binned according to covariate values.
-The code here use the 'centile' command for that.
-If these estimates of the conditional quantiles of the residuals are NOT WITHIN error of zero then the model assumption is wrong.
+If the estimates of the conditional quantiles of the residuals are frequently NOT WITHIN error of zero then the model assumption is wrong.
 
 For a chosen covariate, the code generates plots with multiple panels.
 The covariate is divided into 10 equally spaced bins.
 The final panel is a histogram of the data binned according to the covariate.
 The other panels each correspond to a requested quantile model in sqreg. They are ordered left to right, top to bottom.
-The dots are the estimated quantiles of the residuals in the bin, and their error bars show the accuracy of the estimate.
-If an error bar does not cross zero then the the model assumption is wrong for the quantile model.
-If there is a systematic difference between quantile of the residual and the covariate then that may point to an improved model.
+The dots are the estimated quantiles of the residuals in the bin, and their error bars show a 95% confidence interval for the estimate.
+If many more than 5% of the error bars do not cross zero then the the model assumption is wrong for the quantile model.
+If the quantile of the residual is systematically different to zero then that suggests covariates to add to the model.
 
 Below is an example where the conditional quantiles appear correctly predicted by the model for the 20th percentile.
+
 ![A panel with all error bars crossing zero](/demo_panel_pass.PNG)
 
 When there are many error bars that dont cross zero then I conclude that the conditional quantiles are not predicted by the model.
 The figure below is an example of this.
-In this case, the model is missing the square of 'x1'
+In this case, the model is missing the square of 'x1'.
+
 ![A panel with some error bars above zero](/demo_panel_fail.PNG)
 
 ## References
