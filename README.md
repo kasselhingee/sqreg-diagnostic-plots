@@ -7,7 +7,7 @@ See the diagnostic plots in action in Appendix B of this publication.
 ## Background
 In ordinary least squares regression we often create residual plots to check that residuals are centred around zero and have the same variance. If this is not the case then we must modify the model.
 
-For quantile regression of the $Q$th quantile, the equivalent is that the residuals should have a $Q$th quantile of zero.
+For quantile regression of the Qth quantile, the equivalent is that the residuals should have a Qth quantile of zero.
 An example graphic for checking this is created by the `cqcheck()` function in the `qgam` package (Fasiolo et al., 2021) for R.
 While Stata can do quantile regression, I could not find any methods to easily create a similar plot in Stata, thats what the scripts in this repository do.
 
@@ -57,7 +57,7 @@ If there are many (more than 1 in 20 say) that don't cross zero then that model 
 A systematic difference to zero may suggest terms to add to the model.
 
 ### Long
-In every quantile regression model for quantile $Q$, there is an assumption that at any given covariate values, the $Q$th quantile of the response is predicted by the model.
+In every quantile regression model for quantile Q, there is an assumption that at any given covariate values, the Qth quantile of the response is predicted by the model.
 Often this quantile of the response is called the 'conditional quantile' because it is conditioned on the given covariate values. Another way to state this assumption is that the conditional quantile of the residual (response - prediction) is zero.
 In `sqreg` this assumption is made for every quantile modelled.
 
