@@ -1,14 +1,13 @@
 # qreg-diagnostic-plots
-Scripts to create diagnostic plots of stata sqreg fits.
+Scripts to create diagnostic plots of Stata `sqreg` fits.
 Initially created for the publication: Clayton, H., Hingee, K. L., Chancellor, W., Lindenmayer, D., van Dijk, A., Vardon, M., & Boult, C. (2024). Private benefits of natural capital on farms across an endangered ecoregion. Ecological Economics, 218, 108116. https://doi.org/10.1016/j.ecolecon.2024.108116.
 See the diagnostic plots in action in Appendix B of this publication.
 
 
 ## Background
-In ordinary least squares regression we often create residual plots to check that residuals have the correct behaviour 
-(centered on zero and constant variance). If this is not the case then we must modify the model.
+In ordinary least squares regression we often create residual plots to check that residuals are centred around zero and have the same variance. If this is not the case then we must modify the model.
 
-For quantile regression of the Qth quantile, the equivalent is that the residuals should have a Qth quantile of zero.
+For quantile regression of the `Q`th quantile, the equivalent is that the residuals should have a `Q`th quantile of zero.
 An example graphic for checking this is created by the `cqcheck()` function in the `qgam` package (Fasiolo et al., 2021) for R.
 While Stata can do quantile regression, I could not find any methods to easily create a similar plot in Stata, thats what the scripts in this repository do.
 
@@ -38,11 +37,11 @@ Choose a name to prefix all the files generated (demo here):
 local modname = "demo" 
 ```
 
-Save the predictions and residuals from sqreg into a file with:
+Save the predictions and residuals from `sqreg` into a file with:
 ```
 run sqreg_saveresiduals `modname'
 ```
-This will also overwrite your returned data.
+__Warning: This will also overwrite your returned data.__
 
 
 Use this file to generate diagnostic plots with:
@@ -53,26 +52,26 @@ run sqreg_diagnosticplot "covariatename" `modname' "`quantiles'"
 
 ## Assessing Your Model
 ### Quick
-In the figures produced, the error bars should usually cross zero.
+In the figures produced by running `sqreg_diagnosticplot`, the error bars should usually cross zero.
 If there are many (more than 1 in 20 say) that don't cross zero then that model is not predicting the quantiles correctly.
 A systematic difference to zero may suggest terms to add to the model.
 
 ### Long
-In every quantile regression model for quantile Q, there is an assumption that at any given covariate values, the Qth quantile of the response is predicted by the model.
-Often this quantile of the response conditional on covariate values is called the 'conditional quantile'. Another way to state this assumption is that the conditional quantile of the residual (response - prediction) is zero.
-In 'sqreg' this assumption is made for every quantile modelled.
+In every quantile regression model for quantile `Q`, there is an assumption that at any given covariate values, the `Q`th quantile of the response is predicted by the model.
+Often this quantile of the response is called the 'conditional quantile' because it is conditioned on the given covariate values. Another way to state this assumption is that the conditional quantile of the residual (response - prediction) is zero.
+In `sqreg` this assumption is made for every quantile modelled.
 
 
 Usually data is such that every measurement has a unique set of covariate values, so we cannot estimate conditional quantiles of the residuals directly.
 But we can get close by estimating the quantiles of the residuals binned according to covariate values.
-If the estimates of the conditional quantiles of the residuals are frequently NOT WITHIN error of zero then the model assumption is wrong.
+If the estimates of the conditional quantiles of the residuals are often *not* within error of zero then the model assumption is wrong.
 
 For a chosen covariate, the code generates plots with multiple panels.
 The covariate is divided into 10 equally spaced bins.
 The final panel is a histogram of the data binned according to the covariate.
-The other panels each correspond to a requested quantile model in sqreg. They are ordered left to right, top to bottom.
+The other panels each correspond to a requested quantile model in `sqreg`. They are ordered left to right, top to bottom.
 The dots are the estimated quantiles of the residuals in the bin, and their error bars show a 95% confidence interval for the estimate.
-If for any model, many more than 5% of the error bars do not cross zero then the the model assumption is wrong for the quantile model.
+If for any model, many more than 5% of the error bars do not cross zero then the model assumption is wrong for that model.
 If the quantile of the residual is systematically different to zero then that suggests covariates to add to the model.
 
 Below is an example where the conditional quantiles appear correctly predicted by the model for the 20th percentile.
